@@ -1,15 +1,15 @@
 // BlackMagic Design Audio Monitor
 
-var tcp = require('../../tcp');
-var instance_skel = require('../../instance_skel');
-var debug;
-var log;
+var tcp = require('../../tcp')
+var instance_skel = require('../../instance_skel')
+var debug
+var log
 
 function instance(system) {
-	var self = this;
+	var self = this
 
 	// super-constructor
-	instance_skel.apply(this, arguments);
+	instance_skel.apply(this, arguments)
 
 	self.audio_meter = [
 		{ id: 'VU (-20dBFS Ref)', label: 'VU (-20dBFS Ref)' },
@@ -21,7 +21,7 @@ function instance(system) {
 		{ id: 'Loudness (EBU +9 scale)', label: 'Loudness (EBU +9 scale)' },
 		{ id: 'Loudness (EBU +18 scale)', label: 'Loudness (EBU +18 scale)' },
 	]
-	
+
 	self.audio_input = [
 		{ id: 'Speaker Stereo SDI Stereo 1-2', label: 'SDI Stereo 1-2' },
 		{ id: 'Speaker Stereo SDI Stereo 3-4', label: 'SDI Stereo 3-4' },
@@ -36,121 +36,118 @@ function instance(system) {
 		{ id: 'Speaker Stereo RCA Stereo', label: 'RCA Stereo' },
 	]
 
-	self.actions(); // export actions
+	self.actions() // export actions
 
-	return self;
+	return self
 }
 
-instance.prototype.deviceInformation = function(key,data) {
-	var self = this;
-	var oldHasData = self.has_data = true;
-	
-	self.log('debug','device information process key: ' + key)
+instance.prototype.deviceInformation = function (key, data) {
+	var self = this
+	var oldHasData = (self.has_data = true)
+
+	self.log('debug', 'device information process key: ' + key)
 
 	// Initial data from device
 	if (oldHasData != self.has_data && self.has_data) {
-		self.checkFeedbacks();
+		self.checkFeedbacks()
 	}
+}
 
-};
+instance.prototype.updateConfig = function (config) {
+	var self = this
 
-instance.prototype.updateConfig = function(config) {
-	var self = this;
+	self.config = config
+	self.init_tcp()
+}
 
-	self.config = config;
-	self.init_tcp();
-};
+instance.prototype.init = function () {
+	var self = this
 
-instance.prototype.init = function() {
-	var self = this;
+	debug = self.debug
+	log = self.log
 
-	debug = self.debug;
-	log = self.log;
+	self.init_tcp()
 
-	self.init_tcp();
+	self.update_variables() // export variables
+	self.init_presets()
+}
 
-	self.update_variables(); // export variables
-	self.init_presets();
-};
-
-instance.prototype.init_tcp = function() {
-	var self = this;
-	var receivebuffer = '';
+instance.prototype.init_tcp = function () {
+	var self = this
+	var receivebuffer = ''
 
 	if (self.socket !== undefined) {
-		self.socket.destroy();
-		delete self.socket;
+		self.socket.destroy()
+		delete self.socket
 	}
 
-	self.has_data = false;
+	self.has_data = false
 
 	if (self.config.host) {
-		self.socket = new tcp(self.config.host, self.config.port);
+		self.socket = new tcp(self.config.host, self.config.port)
 
 		self.socket.on('status_change', function (status, message) {
-			self.status(status, message);
-		});
+			self.status(status, message)
+		})
 
 		self.socket.on('error', function (err) {
-			debug('Network error', err);
-			self.log('error','Network error: ' + err.message);
-		});
+			debug('Network error', err)
+			self.log('error', 'Network error: ' + err.message)
+		})
 
 		self.socket.on('connect', function () {
-			debug('Connected');
-		});
+			debug('Connected')
+		})
 
 		// separate buffered stream into lines with responses
 		self.socket.on('data', function (chunk) {
-			self.log('debug','data received')
-			var i = 0, line = '', offset = 0;
-			receivebuffer += chunk;
+			self.log('debug', 'data received')
+			var i = 0,
+				line = '',
+				offset = 0
+			receivebuffer += chunk
 
-			while ( (i = receivebuffer.indexOf('\n', offset)) !== -1) {
-				line = receivebuffer.substr(offset, i - offset);
-				offset = i + 1;
-				self.socket.emit('receiveline', line.toString());
-				self.log('debug',line.toString())
+			while ((i = receivebuffer.indexOf('\n', offset)) !== -1) {
+				line = receivebuffer.substr(offset, i - offset)
+				offset = i + 1
+				self.socket.emit('receiveline', line.toString())
+				self.log('debug', line.toString())
 			}
 
 			receivebuffer = receivebuffer.substr(offset)
-		});
+		})
 
 		self.socket.on('receiveline', function (line) {
+			if (self.command === null && line.match(/:/)) {
+				self.command = line
+				self.log('debug', 'command: ' + line)
+			} else if (self.command !== null && line.length > 0) {
+				self.stash.push(line.trim())
+			} else if (line.length === 0 && self.command !== null) {
+				var cmd = self.command.trim().split(/:/)[0]
 
-			if (self.command === null && line.match(/:/) ) {
-				self.command = line;
-				self.log('debug','command: ' + line)
-			}
-			else if (self.command !== null && line.length > 0) {
-				self.stash.push(line.trim());
-			}
-			else if (line.length === 0 && self.command !== null) {
-				var cmd = self.command.trim().split(/:/)[0];
+				self.log('debug', 'COMMAND: ' + cmd)
 
-				self.log('debug','COMMAND: ' + cmd);
-
-				var obj = {};
+				var obj = {}
 				self.stash.forEach(function (val) {
-					var info = val.split(/\s*:\s*/);
-					obj[info.shift()] = info.join(':');
-				});
+					var info = val.split(/\s*:\s*/)
+					obj[info.shift()] = info.join(':')
+				})
 
-				self.deviceInformation(cmd, obj);
+				self.deviceInformation(cmd, obj)
 
-				self.stash = [];
-				self.command = null;
+				self.stash = []
+				self.command = null
+			} else {
+				self.log('debug', 'weird response from device', line, line.length)
 			}
-			else {
-				self.log('debug','weird response from device', line, line.length);
-			}
-		});
+		})
 	}
-};
+}
 
 // Return config fields for web config
 instance.prototype.config_fields = function () {
-	var self = this;
+	var self = this
 
 	return [
 		{
@@ -176,10 +173,10 @@ instance.prototype.config_fields = function () {
 			regex: self.REGEX_PORT,
 		},
 	]
-};
+}
 
 // When module gets deleted
-instance.prototype.destroy = function() {
+instance.prototype.destroy = function () {
 	var self = this
 
 	if (self.socket !== undefined) {
@@ -187,25 +184,25 @@ instance.prototype.destroy = function() {
 	}
 
 	debug('destroy', self.id)
-};
+}
 
 instance.prototype.update_variables = function (system) {
 	var self = this
 	var variables = []
-	
+
 	// feedbacks
 	var feedbacks = {}
 
-	self.setFeedbackDefinitions(feedbacks);
-};
+	self.setFeedbackDefinitions(feedbacks)
+}
 
-instance.prototype.feedback = function(feedback, bank) {
-	var self = this;
-};
+instance.prototype.feedback = function (feedback, bank) {
+	var self = this
+}
 
 instance.prototype.init_presets = function () {
-	var self = this;
-	var presets = [];
+	var self = this
+	var presets = []
 
 	for (i = 0; i < self.audio_meter.length; ++i) {
 		presets.push({
@@ -216,7 +213,7 @@ instance.prototype.init_presets = function () {
 				text: self.audio_meter[i].label,
 				size: 'auto',
 				color: '16777215',
-				bgcolor: self.rgb(0, 0, 0)
+				bgcolor: self.rgb(0, 0, 0),
 			},
 			actions: [
 				{
@@ -226,9 +223,9 @@ instance.prototype.init_presets = function () {
 					},
 				},
 			],
-		});
+		})
 	}
-	
+
 	for (i = 0; i < self.audio_input.length; ++i) {
 		presets.push({
 			category: 'Audio Input',
@@ -238,7 +235,7 @@ instance.prototype.init_presets = function () {
 				text: self.audio_input[i].label,
 				size: 'auto',
 				color: '16777215',
-				bgcolor: self.rgb(0, 0, 0)
+				bgcolor: self.rgb(0, 0, 0),
 			},
 			actions: [
 				{
@@ -248,18 +245,17 @@ instance.prototype.init_presets = function () {
 					},
 				},
 			],
-		});
+		})
 	}
-	
-	self.setPresetDefinitions(presets);
-};
 
-instance.prototype.actions = function() {
-	var self = this;
+	self.setPresetDefinitions(presets)
+}
+
+instance.prototype.actions = function () {
+	var self = this
 
 	self.system.emit('instance_actions', self.id, {
-
-		'audio_meter': {
+		audio_meter: {
 			label: 'Audio Meter Mode',
 			options: [
 				{
@@ -271,7 +267,7 @@ instance.prototype.actions = function() {
 				},
 			],
 		},
-		'audio_input': {
+		audio_input: {
 			label: 'Audio Input',
 			options: [
 				{
@@ -283,7 +279,7 @@ instance.prototype.actions = function() {
 				},
 			],
 		},
-		'speaker': {
+		speaker: {
 			label: 'Speaker Volume',
 			options: [
 				{
@@ -293,10 +289,10 @@ instance.prototype.actions = function() {
 					default: 128,
 					min: 0,
 					max: 255,
-				},	
+				},
 			],
 		},
-		'headphone': {
+		headphone: {
 			label: 'Headphone Volume',
 			options: [
 				{
@@ -306,10 +302,10 @@ instance.prototype.actions = function() {
 					default: 128,
 					min: 0,
 					max: 255,
-				},	
+				},
 			],
 		},
-		'mute': {
+		mute: {
 			label: 'Mute',
 			options: [
 				{
@@ -320,11 +316,11 @@ instance.prototype.actions = function() {
 					choices: [
 						{ id: 'true', label: 'On' },
 						{ id: 'false', label: 'Off' },
-					]
-				},	
+					],
+				},
 			],
 		},
-		'solo': {
+		solo: {
 			label: 'Solo',
 			options: [
 				{
@@ -337,49 +333,48 @@ instance.prototype.actions = function() {
 						{ id: 'Left', label: 'Left' },
 						{ id: 'Right', label: 'Right' },
 					],
-				},	
+				},
 			],
 		},
-	});
+	})
 }
 
-instance.prototype.action = function(action) {
-
+instance.prototype.action = function (action) {
 	var self = this
 	var cmd
 
 	if (action.action === 'audio_meter') {
 		cmd = 'AUDIO METER:\nMeter Mode: ' + action.options.audio_meter + '\n\n'
-		self.log('debug',cmd)
+		self.log('debug', cmd)
 	}
-	
+
 	if (action.action === 'audio_input') {
 		cmd = 'AUDIO INPUT:\nRouting: ' + action.options.audio_input + '\n\n'
-		self.log('debug',cmd)
+		self.log('debug', cmd)
 	}
-	
+
 	if (action.action === 'speaker') {
 		cmd = 'AUDIO OUTPUT:\nGain: Speaker Stereo ' + action.options.speaker + '\n\n'
-		self.log('debug',cmd)
+		self.log('debug', cmd)
 	}
-	
+
 	if (action.action === 'headphone') {
 		cmd = 'AUDIO OUTPUT:\nGain: Headphone Stereo ' + action.options.headphone + '\n\n'
-		self.log('debug',cmd)
+		self.log('debug', cmd)
 	}
-	
+
 	if (action.action === 'mute') {
 		cmd = 'AUDIO OUTPUT:\nMute: ' + action.options.mute + '\n\n'
-		self.log('debug',cmd)
+		self.log('debug', cmd)
 	}
-	
+
 	if (action.action === 'solo') {
 		cmd = 'AUDIO OUTPUT:\nSolo: ' + action.options.solo + '\n\n'
-		self.log('debug',cmd)
+		self.log('debug', cmd)
 	}
-	
+
 	console.log(cmd)
-	
+
 	if (cmd !== undefined) {
 		if (self.socket !== undefined && self.socket.connected) {
 			self.socket.send(cmd)
@@ -387,7 +382,7 @@ instance.prototype.action = function(action) {
 			debug('Socket not connected :(')
 		}
 	}
-};
+}
 
 instance_skel.extendedBy(instance)
 exports = module.exports = instance
