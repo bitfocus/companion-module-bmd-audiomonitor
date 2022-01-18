@@ -11,6 +11,9 @@ function instance(system) {
 	// super-constructor
 	instance_skel.apply(this, arguments)
 
+	self.stash = []
+	self.command = null
+
 	self.audio_meter = [
 		{ id: 'VU (-20dBFS Ref)', label: 'VU (-20dBFS Ref)' },
 		{ id: 'VU (-18dBFS Ref)', label: 'VU (-18dBFS Ref)' },

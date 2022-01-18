@@ -1,6 +1,6 @@
 {
 	"name": "bmd-audiomonitor",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"api_version": "1.0.0",
 	"keywords": [ "Audio", "Monitoring", "Meter" ],
 	"manufacturer": "Blackmagic Design",
