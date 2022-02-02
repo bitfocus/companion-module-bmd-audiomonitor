@@ -20,5 +20,9 @@
 		"url": "git+https://github.com/bitfocus/companion-module-bmd-audiomonitor.git"
 	},
 	"author": "Peter Daniel",
-	"license": "MIT"
+	"license": "MIT",
+	"homepage": "https://github.com/bitfocus/companion-module-bmd-audiomonitor#readme",
+	"bugs": {
+		"url": "https://github.com/bitfocus/companion-module-bmd-audiomonitor/issues"
+	}
 }
