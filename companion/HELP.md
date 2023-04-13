@@ -7,10 +7,37 @@ This module will connect to Blackmagic Design Audio Monitor.
 - Type in the device IP address.
 - The device will communicate over port 9996.
 
-## Available Actions
+## Actions
 
-## Available Feedbacks
+- Audio Meter
+- Audio Input
+- Speaker Volume
+- Headphone Volume
+- Mute
+- Solo
 
-## Available Presets
+## Feedbacks
 
-## Available Variables
+- Audio Meter
+- Audio Input
+- Speaker Volume
+- Headphone Volume
+- Mute
+- Solo
+
+## Presets
+- Audio Meter
+- Audio Input
+- Speaker Volume
+- Headphone Volume
+- Mute
+- Solo
+
+## Variables
+
+- Audio Meter
+- Audio Input
+- Speaker Volume
+- Headphone Volume
+- Mute
+- Solo
