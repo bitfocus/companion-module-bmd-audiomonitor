@@ -1,4 +1,4 @@
-Blackmagic Audio Monitor
+# Blackmagic Audio Monitor
 
 This module will connect to Blackmagic Design Audio Monitor.
 
