@@ -5,8 +5,13 @@
 	"description": "Module to control Blackmagic Design Audio Monitor",
 	"version": "3.0.0",
 	"license": "MIT",
-	"repository": "",
-	"bugs": "",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/bitfocus/companion-module-bmd-audiomonitor.git"
+	},
+	"bugs": {
+		"url": "https://github.com/bitfocus/companion-module-bmd-audiomonitor/issues"
+	},
 	"maintainers": [
 		{
 			"name": "Colin Mulcahy",
