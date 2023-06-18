@@ -2,6 +2,10 @@
 
 This module will connect to the Blackmagic Design AudioMonitor 12G device.
 
+![Sample BMD AudioMonitor Layout](./images/layout01.png)
+
+![Sample BMD AudioMonitor Layout](./images/layout02.png)
+
 #### Configuration
 
 - Enter the IP address for your device. ie. 192.168.10.50
