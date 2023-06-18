@@ -6,6 +6,10 @@ This module will connect to the Blackmagic Design AudioMonitor 12G device.
 
 ![Sample BMD AudioMonitor Layout](./images/layout02.png)
 
+#### Version 3
+
+This module is only compatible with version 3 of Bitfocus Companion and above. IF you have used a previous version of the module, it is easy to build a new one very quickly as it is feature complete with Actions, Feedback and multiple Presets.
+
 #### Configuration
 
 - Enter the IP address for your device. ie. 192.168.10.50
