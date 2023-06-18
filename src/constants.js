@@ -16,18 +16,6 @@ function getValue(base, offset) {
 
 const StyleColors = {
 
-	Red		:	combineRgb(255, 0, 0),
-	Lime	:	combineRgb(0, 255, 0),
-	Blue	:	combineRgb(0, 0, 255),
-	Cyan	: 	combineRgb(0, 255, 255),
-	Silver	:	combineRgb(192, 192, 192),
-	Gray	:	combineRgb(128, 128, 128),
-	Maroon	:	combineRgb(128, 0, 0),
-	Olive	:	combineRgb(128, 128, 0),
-	Purple	:	combineRgb(128, 0, 128),
-	Navy	:	combineRgb(0, 0, 128),
-	
-
 	Orange	:	combineRgb(255, 128, 0),
 	Brown	:	combineRgb(154, 76, 0),	
 
