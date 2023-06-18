@@ -1,3 +1,3 @@
-# companion-gs-audiomonitor
+# companion-bmd-audiomonitor
 
 See HELP.md and LICENSE
