@@ -8,7 +8,7 @@ This module will connect to the Blackmagic Design AudioMonitor 12G device.
 
 #### Version 3
 
-This module is only compatible with version 3 of Bitfocus Companion and above. IF you have used a previous version of the module, it is easy to build a new one very quickly as it is feature complete with Actions, Feedback and multiple Presets.
+This module is only compatible with version 3 of Bitfocus Companion and above. If you have used a previous version of the module, it is easy to build a new one very quickly as it is feature complete with Actions, Feedback and multiple Presets.
 
 #### Configuration
 
