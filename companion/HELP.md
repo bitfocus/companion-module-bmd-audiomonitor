@@ -8,7 +8,7 @@ This module will connect to the Blackmagic Design AudioMonitor 12G device.
 
 #### Version 3
 
-This module is only compatible with version 3 of Bitfocus Companion and above. IF you have used a previous version of the module, it is easy to build a new one very quickly as it is feature complete with Actions, Feedback and multiple Presets.
+This module is only compatible with version 3 of Bitfocus Companion and above. If you have used a previous version of the module, it is easy to build a new one very quickly as it is feature complete with Actions, Feedback and multiple Presets.
 
 #### Configuration
 
@@ -29,7 +29,7 @@ The following actions are available:
 
 * **Mute**
 
-    This be changed to: Off or On
+    This can be changed to: Off or On
 
 * **Solo**
 
@@ -91,7 +91,7 @@ The following feedbacks are available:
 
 Presets are avaiable in 3 formats:
 
-1. **Basic** - All buttons have a default background colour of dark grey. The feeback background is set to yellow.
+1. **Basic** - All buttons have a default background color of dark grey. The feeback background is set to yellow.
 
 2. **Colored** - Each button group has a selected background color. The feeback background is set to yellow.
 
